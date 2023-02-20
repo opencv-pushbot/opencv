@@ -50,6 +50,11 @@ namespace {
     cap, (BackendMode)(mode), 1000, name, createBackendFactory(createCaptureFile, createCaptureCamera, createWriter) \
 },
 
+#define DECLARE_DEPRICATED_BACKEND(cap, name) \
+{ \
+    cap, (BackendMode)0, 1000, name, NULL \
+},
+
 /** Ordering guidelines:
 - modern optimized, multi-platform libraries: ffmpeg, gstreamer, Media SDK
 - platform specific universal SDK: WINRT, AVFOUNDATION, MSMF/DSHOW, V4L/V4L2
@@ -183,6 +188,20 @@ static const struct VideoBackendInfo builtin_backends[] =
     // dropped backends: MIL, TYZX
 };
 
+static const struct VideoBackendInfo depricated_backends[] =
+{
+    DECLARE_DEPRICATED_BACKEND(CAP_QT, "QuickTime")
+    DECLARE_DEPRICATED_BACKEND(CAP_UNICAP, "Unicap")
+    DECLARE_DEPRICATED_BACKEND(CAP_OPENNI, "OpenNI")
+    DECLARE_DEPRICATED_BACKEND(CAP_OPENNI_ASUS, "OpenNI")
+    DECLARE_DEPRICATED_BACKEND(CAP_GIGANETIX, "GigEVisionSDK")
+    DECLARE_DEPRICATED_BACKEND(CAP_INTELPERC, "Intel Perceptual Computing SDK")
+    DECLARE_DEPRICATED_BACKEND(CAP_OPENNI2_ASUS, "OpenNI2")
+    DECLARE_DEPRICATED_BACKEND(CAP_OPENNI2_ASTRA, "OpenNI2")
+};
+
+
+
 bool sortByPriority(const VideoBackendInfo &lhs, const VideoBackendInfo &rhs)
 {
     return lhs.priority > rhs.priority;
@@ -194,6 +213,8 @@ class VideoBackendRegistry
 {
 protected:
     std::vector<VideoBackendInfo> enabledBackends;
+    std::vector<VideoBackendInfo> depricatedBackends;
+
     VideoBackendRegistry()
     {
         const int N = sizeof(builtin_backends)/sizeof(builtin_backends[0]);
@@ -201,6 +222,13 @@ protected:
         for (int i = 0; i < N; i++)
         {
             VideoBackendInfo& info = enabledBackends[i];
+            info.priority = 1000 - i * 10;
+        }
+        const int NN = sizeof(depricated_backends) / sizeof(depricated_backends[0]);
+        depricatedBackends.assign(depricated_backends, depricated_backends + NN);
+        for (int i = 0; i < NN; i++)
+        {
+            VideoBackendInfo& info = depricatedBackends[i];
             info.priority = 1000 - i * 10;
         }
         CV_LOG_DEBUG(NULL, "VIDEOIO: Builtin backends(" << N << "): " << dumpBackends());
@@ -329,6 +357,18 @@ public:
         }
         return result;
     }
+
+    inline std::vector<VideoBackendInfo> getDepricatedBackends() const
+    {
+        std::vector<VideoBackendInfo> result;
+        for (size_t i = 0; i < depricatedBackends.size(); i++)
+        {
+            const VideoBackendInfo& info = depricatedBackends[i];
+            result.push_back(info);
+        }
+        return result;
+    }
+
 };
 
 } // namespace
@@ -350,6 +390,13 @@ std::vector<VideoBackendInfo> getAvailableBackends_Writer()
     const std::vector<VideoBackendInfo> result = VideoBackendRegistry::getInstance().getAvailableBackends_Writer();
     return result;
 }
+
+std::vector<VideoBackendInfo> getDepricatedBackends()
+{
+    const std::vector<VideoBackendInfo> result = VideoBackendRegistry::getInstance().getDepricatedBackends();
+    return result;
+}
+
 
 cv::String getBackendName(VideoCaptureAPIs api)
 {
