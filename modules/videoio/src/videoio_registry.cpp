@@ -50,7 +50,7 @@ namespace {
     cap, (BackendMode)(mode), 1000, name, createBackendFactory(createCaptureFile, createCaptureCamera, createWriter) \
 },
 
-#define DECLARE_DEPRICATED_BACKEND(cap, name) \
+#define DECLARE_DEPRECATED_BACKEND(cap, name) \
 { \
     cap, (BackendMode)0, 1000, name, NULL \
 },
@@ -188,16 +188,16 @@ static const struct VideoBackendInfo builtin_backends[] =
     // dropped backends: MIL, TYZX
 };
 
-static const struct VideoBackendInfo depricated_backends[] =
+static const struct VideoBackendInfo deprecated_backends[] =
 {
 #ifdef WIN32
-    DECLARE_DEPRICATED_BACKEND(CAP_VFW, "Video for Windows")
+    DECLARE_DEPRECATED_BACKEND(CAP_VFW, "Video for Windows")
 #endif
-    DECLARE_DEPRICATED_BACKEND(CAP_QT, "QuickTime")
-    DECLARE_DEPRICATED_BACKEND(CAP_UNICAP, "Unicap")
-    DECLARE_DEPRICATED_BACKEND(CAP_OPENNI, "OpenNI")
-    DECLARE_DEPRICATED_BACKEND(CAP_OPENNI_ASUS, "OpenNI")
-    DECLARE_DEPRICATED_BACKEND(CAP_GIGANETIX, "GigEVisionSDK")
+    DECLARE_DEPRECATED_BACKEND(CAP_QT, "QuickTime")
+    DECLARE_DEPRECATED_BACKEND(CAP_UNICAP, "Unicap")
+    DECLARE_DEPRECATED_BACKEND(CAP_OPENNI, "OpenNI")
+    DECLARE_DEPRECATED_BACKEND(CAP_OPENNI_ASUS, "OpenNI")
+    DECLARE_DEPRECATED_BACKEND(CAP_GIGANETIX, "GigEVisionSDK")
 };
 
 
@@ -213,7 +213,7 @@ class VideoBackendRegistry
 {
 protected:
     std::vector<VideoBackendInfo> enabledBackends;
-    std::vector<VideoBackendInfo> depricatedBackends;
+    std::vector<VideoBackendInfo> deprecatedBackends;
 
     VideoBackendRegistry()
     {
@@ -224,11 +224,11 @@ protected:
             VideoBackendInfo& info = enabledBackends[i];
             info.priority = 1000 - i * 10;
         }
-        const int NN = sizeof(depricated_backends) / sizeof(depricated_backends[0]);
-        depricatedBackends.assign(depricated_backends, depricated_backends + NN);
+        const int NN = sizeof(deprecated_backends) / sizeof(deprecated_backends[0]);
+        deprecatedBackends.assign(deprecated_backends, deprecated_backends + NN);
         for (int i = 0; i < NN; i++)
         {
-            VideoBackendInfo& info = depricatedBackends[i];
+            VideoBackendInfo& info = deprecatedBackends[i];
             info.priority = 1000 - i * 10;
         }
         CV_LOG_DEBUG(NULL, "VIDEOIO: Builtin backends(" << N << "): " << dumpBackends());
@@ -358,12 +358,12 @@ public:
         return result;
     }
 
-    inline std::vector<VideoBackendInfo> getDepricatedBackends() const
+    inline std::vector<VideoBackendInfo> getDeprecatedBackends() const
     {
         std::vector<VideoBackendInfo> result;
-        for (size_t i = 0; i < depricatedBackends.size(); i++)
+        for (size_t i = 0; i < deprecatedBackends.size(); i++)
         {
-            const VideoBackendInfo& info = depricatedBackends[i];
+            const VideoBackendInfo& info = deprecatedBackends[i];
             result.push_back(info);
         }
         return result;
@@ -391,9 +391,9 @@ std::vector<VideoBackendInfo> getAvailableBackends_Writer()
     return result;
 }
 
-std::vector<VideoBackendInfo> getDepricatedBackends()
+std::vector<VideoBackendInfo> getDeprecatedBackends()
 {
-    const std::vector<VideoBackendInfo> result = VideoBackendRegistry::getInstance().getDepricatedBackends();
+    const std::vector<VideoBackendInfo> result = VideoBackendRegistry::getInstance().getDeprecatedBackends();
     return result;
 }
 

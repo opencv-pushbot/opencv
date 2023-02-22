@@ -34,7 +34,7 @@ namespace videoio_registry {
 std::vector<VideoBackendInfo> getAvailableBackends_CaptureByIndex();
 std::vector<VideoBackendInfo> getAvailableBackends_CaptureByFilename();
 std::vector<VideoBackendInfo> getAvailableBackends_Writer();
-std::vector<VideoBackendInfo> getDepricatedBackends();
+std::vector<VideoBackendInfo> getDeprecatedBackends();
 
 } // namespace
 

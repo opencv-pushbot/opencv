@@ -231,7 +231,7 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
 
     const VideoCaptureParameters parameters(params);
     const std::vector<VideoBackendInfo> backends = cv::videoio_registry::getAvailableBackends_CaptureByIndex();
-    const std::vector<VideoBackendInfo> depricatedBackends = cv::videoio_registry::getDepricatedBackends();
+    const std::vector<VideoBackendInfo> deprecatedBackends = cv::videoio_registry::getDeprecatedBackends();
     for (size_t i = 0; i < backends.size(); i++)
     {
         const VideoBackendInfo& info = backends[i];
@@ -316,9 +316,9 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
         CV_Error_(Error::StsError, ("could not open camera %d", cameraNum));
     }
 
-    for (size_t i = 0; i < depricatedBackends.size(); i++)
+    for (size_t i = 0; i < deprecatedBackends.size(); i++)
     {
-        const VideoBackendInfo& info = depricatedBackends[i];
+        const VideoBackendInfo& info = deprecatedBackends[i];
         if (apiPreference == info.id)
         {
             //chosen backend is not supported by OpenCV
