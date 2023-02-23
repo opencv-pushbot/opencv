@@ -327,7 +327,7 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
         }
     }
 
-    CV_LOG_INFO(NULL, "VIDEOIO: chosen backend is supported by OpenCV, but not working now. Maybe your computer does not support chosen backend or try to build OpenCV with right flags. ");
+    CV_LOG_INFO(NULL, "VIDEOIO: chosen backend is supported by OpenCV, but not working now. Maybe your computer does not support chosen backend or try to build OpenCV with right flags.");
     
     return false;
 }
