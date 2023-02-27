@@ -321,14 +321,14 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
         const VideoBackendInfo& info = deprecatedBackends[i];
         if (apiPreference == info.id)
         {
-            //chosen backend is not supported by OpenCV
-            CV_LOG_INFO(NULL, "VIDEOIO: chosen backend is not supported by OpenCV");
+            //chosen backend is removed from OpenCV
+            CV_LOG_INFO(NULL, "VIDEOIO: chosen backend is removed from OpenCV");
             return false;
         }
     }
 
     CV_LOG_INFO(NULL, "VIDEOIO: chosen backend is supported by OpenCV, but not working now. Maybe your computer does not support chosen backend or try to build OpenCV with right flags.");
-    
+
     return false;
 }
 
