@@ -117,6 +117,7 @@ bool VideoCapture::open(const String& filename, int apiPreference, const std::ve
 
     const VideoCaptureParameters parameters(params);
     const std::vector<VideoBackendInfo> backends = cv::videoio_registry::getAvailableBackends_CaptureByFilename();
+    const std::vector<VideoBackendShortInfo> deprecatedBackends = cv::videoio_registry::getDeprecatedBackends();
     for (size_t i = 0; i < backends.size(); i++)
     {
         const VideoBackendInfo& info = backends[i];
@@ -201,6 +202,23 @@ bool VideoCapture::open(const String& filename, int apiPreference, const std::ve
         CV_Error_(Error::StsError, ("could not open '%s'", filename.c_str()));
     }
 
+    for (size_t i = 0; i < deprecatedBackends.size(); i++)
+    {
+        const VideoBackendShortInfo& info = deprecatedBackends[i];
+        if (apiPreference == info.id)
+        {
+            //chosen backend is removed from OpenCV
+            CV_LOG_DEBUG(NULL,
+                cv::format("VIDEOIO(%s): backend is removed from OpenCV",
+                    info.name));
+            return false;
+        }
+    }
+
+    CV_LOG_DEBUG(NULL, cv::format("VIDEOIO: choosen backend does not work or wrong.",
+        "Please make sure that your computer support chosen backend and OpenCV built"
+        "with right flags."));
+
     return false;
 }
 
@@ -231,7 +249,7 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
 
     const VideoCaptureParameters parameters(params);
     const std::vector<VideoBackendInfo> backends = cv::videoio_registry::getAvailableBackends_CaptureByIndex();
-    const std::vector<VideoBackendInfo> deprecatedBackends = cv::videoio_registry::getDeprecatedBackends();
+    const std::vector<VideoBackendShortInfo> deprecatedBackends = cv::videoio_registry::getDeprecatedBackends();
     for (size_t i = 0; i < backends.size(); i++)
     {
         const VideoBackendInfo& info = backends[i];
@@ -318,16 +336,19 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
 
     for (size_t i = 0; i < deprecatedBackends.size(); i++)
     {
-        const VideoBackendInfo& info = deprecatedBackends[i];
+        const VideoBackendShortInfo& info = deprecatedBackends[i];
         if (apiPreference == info.id)
         {
-            //chosen backend is removed from OpenCV
-            CV_LOG_INFO(NULL, "VIDEOIO: chosen backend is removed from OpenCV");
+            CV_LOG_DEBUG(NULL,
+                cv::format("VIDEOIO(%s): backend is removed from OpenCV",
+                    info.name)); 
             return false;
         }
     }
 
-    CV_LOG_INFO(NULL, "VIDEOIO: chosen backend is supported by OpenCV, but not working now. Maybe your computer does not support chosen backend or try to build OpenCV with right flags.");
+    CV_LOG_DEBUG(NULL, cv::format("VIDEOIO: choosen backend does not work or wrong.",
+        "Please make sure that your computer support chosen backend and OpenCV built"
+        "with right flags."));
 
     return false;
 }
@@ -632,6 +653,22 @@ bool VideoWriter::open(const String& filename, int apiPreference, int fourcc, do
             }
         }
     }
+
+    for (const auto& info : videoio_registry::getDeprecatedBackends())
+    {
+        if (apiPreference == info.id)
+        {
+            CV_WRITER_LOG_DEBUG(NULL,
+                cv::format("VIDEOIO(%s): backend is removed from OpenCV",
+                    info.name));
+            return false;
+        }
+    }
+
+    CV_LOG_DEBUG(NULL, cv::format("VIDEOIO: choosen backend does not work or wrong.",
+        "Please make sure that your computer support chosen backend and OpenCV built"
+        "with right flags."));
+
     return false;
 }
 
