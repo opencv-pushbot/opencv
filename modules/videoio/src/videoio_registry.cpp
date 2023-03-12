@@ -184,7 +184,6 @@ static const struct VideoBackendInfo builtin_backends[] =
 #ifdef HAVE_OBSENSOR
     DECLARE_STATIC_BACKEND(CAP_OBSENSOR, "OBSENSOR", MODE_CAPTURE_BY_INDEX, 0, create_obsensor_capture, 0)
 #endif
-                           
     // dropped backends: MIL, TYZX
 };
 
@@ -226,7 +225,7 @@ protected:
         }
         const int NN = sizeof(deprecated_backends) / sizeof(deprecated_backends[0]);
         deprecatedBackends.assign(deprecated_backends, deprecated_backends + NN);
-        
+
         CV_LOG_DEBUG(NULL, "VIDEOIO: Builtin backends(" << N << "): " << dumpBackends());
         if (readPrioritySettings())
         {
