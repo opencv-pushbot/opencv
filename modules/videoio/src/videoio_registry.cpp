@@ -226,10 +226,7 @@ protected:
         }
         const int NN = sizeof(deprecated_backends) / sizeof(deprecated_backends[0]);
         deprecatedBackends.assign(deprecated_backends, deprecated_backends + NN);
-        for (int i = 0; i < NN; i++)
-        {
-            VideoBackendShortInfo& info = deprecatedBackends[i];
-        }
+        
         CV_LOG_DEBUG(NULL, "VIDEOIO: Builtin backends(" << N << "): " << dumpBackends());
         if (readPrioritySettings())
         {
