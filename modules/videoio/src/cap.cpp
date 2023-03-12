@@ -340,7 +340,7 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
         {
             CV_LOG_DEBUG(NULL,
                 cv::format("VIDEOIO(%s): backend is removed from OpenCV",
-                    info.name)); 
+                    info.name));
             return false;
         }
     }
