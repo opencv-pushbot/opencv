@@ -180,14 +180,13 @@ static const struct VideoBackendInfo builtin_backends[] =
                            0)
 #endif
 #endif
-
 #ifdef HAVE_OBSENSOR
     DECLARE_STATIC_BACKEND(CAP_OBSENSOR, "OBSENSOR", MODE_CAPTURE_BY_INDEX, 0, create_obsensor_capture, 0)
 #endif
     // dropped backends: MIL, TYZX
 };
 
-static const struct VideoBackendShortInfo deprecated_backends[] =
+static const struct VideoDeprecatedBackendInfo deprecated_backends[] =
 {
 #ifdef _WIN32
     DECLARE_DEPRECATED_BACKEND(CAP_VFW, "Video for Windows")
@@ -198,7 +197,6 @@ static const struct VideoBackendShortInfo deprecated_backends[] =
     DECLARE_DEPRECATED_BACKEND(CAP_OPENNI_ASUS, "OpenNI")
     DECLARE_DEPRECATED_BACKEND(CAP_GIGANETIX, "GigEVisionSDK")
 };
-
 
 
 bool sortByPriority(const VideoBackendInfo &lhs, const VideoBackendInfo &rhs)
@@ -212,7 +210,7 @@ class VideoBackendRegistry
 {
 protected:
     std::vector<VideoBackendInfo> enabledBackends;
-    std::vector<VideoBackendShortInfo> deprecatedBackends;
+    std::vector<VideoDeprecatedBackendInfo> deprecatedBackends;
 
     VideoBackendRegistry()
     {
@@ -353,15 +351,9 @@ public:
         return result;
     }
 
-    inline std::vector<VideoBackendShortInfo> getDeprecatedBackends() const
+    inline std::vector<VideoDeprecatedBackendInfo> getDeprecatedBackends() const
     {
-        std::vector<VideoBackendShortInfo> result;
-        for (size_t i = 0; i < deprecatedBackends.size(); i++)
-        {
-            const VideoBackendShortInfo& info = deprecatedBackends[i];
-            result.push_back(info);
-        }
-        return result;
+        return deprecatedBackends;
     }
 
 };
@@ -386,9 +378,9 @@ std::vector<VideoBackendInfo> getAvailableBackends_Writer()
     return result;
 }
 
-std::vector<VideoBackendShortInfo> getDeprecatedBackends()
+std::vector<VideoDeprecatedBackendInfo> getDeprecatedBackends()
 {
-    const std::vector<VideoBackendShortInfo> result = VideoBackendRegistry::getInstance().getDeprecatedBackends();
+    const std::vector<VideoDeprecatedBackendInfo> result = VideoBackendRegistry::getInstance().getDeprecatedBackends();
     return result;
 }
 
@@ -408,8 +400,7 @@ cv::String getBackendName(VideoCaptureAPIs api)
     const int M = sizeof(deprecated_backends) / sizeof(deprecated_backends[0]);
     for (size_t i = 0; i < M; i++)
     {
-        const VideoBackendShortInfo& backend = deprecated_backends[i];
-        if (backend.id == api)
+        if (deprecated_backends[i].id == api)
             return cv::format("DerecatedVideoAPI(%d)", (int)api);
     }
 
@@ -501,16 +492,6 @@ std::string getCameraBackendPluginVersion(VideoCaptureAPIs api,
         }
     }
 
-    const std::vector<VideoBackendShortInfo> derpecatedBackends = VideoBackendRegistry::getInstance().getDeprecatedBackends();
-    for (size_t i = 0; i < derpecatedBackends.size(); i++)
-    {
-        const VideoBackendShortInfo& info = derpecatedBackends[i];
-        if (api == info.id)
-        {
-            CV_Error(Error::StsError, cv::format("Backend ID %i is removed from OpenCV", api));
-        }
-    }
-
     CV_Error(Error::StsError, "Unknown or wrong backend ID");
 }
 
@@ -528,16 +509,6 @@ std::string getStreamBackendPluginVersion(VideoCaptureAPIs api,
             CV_Assert(!info.backendFactory.empty());
             CV_Assert(!info.backendFactory->isBuiltIn());
             return getCapturePluginVersion(info.backendFactory, version_ABI, version_API);
-        }
-    }
-
-    const std::vector<VideoBackendShortInfo> derpecatedBackends = VideoBackendRegistry::getInstance().getDeprecatedBackends();
-    for (size_t i = 0; i < derpecatedBackends.size(); i++)
-    {
-        const VideoBackendShortInfo& info = derpecatedBackends[i];
-        if (api == info.id)
-        {
-            CV_Error(Error::StsError, cv::format("Backend ID %i is removed from OpenCV", api));
         }
     }
 
@@ -560,16 +531,6 @@ std::string getWriterBackendPluginVersion(VideoCaptureAPIs api,
             CV_Assert(!info.backendFactory.empty());
             CV_Assert(!info.backendFactory->isBuiltIn());
             return getWriterPluginVersion(info.backendFactory, version_ABI, version_API);
-        }
-    }
-
-    const std::vector<VideoBackendShortInfo> derpecatedBackends = VideoBackendRegistry::getInstance().getDeprecatedBackends();
-    for (size_t i = 0; i < derpecatedBackends.size(); i++)
-    {
-        const VideoBackendShortInfo& info = derpecatedBackends[i];
-        if (api == info.id)
-        {
-            CV_Error(Error::StsError, cv::format("Backend ID %i is removed from OpenCV", api));
         }
     }
 

@@ -117,7 +117,7 @@ bool VideoCapture::open(const String& filename, int apiPreference, const std::ve
 
     const VideoCaptureParameters parameters(params);
     const std::vector<VideoBackendInfo> backends = cv::videoio_registry::getAvailableBackends_CaptureByFilename();
-    const std::vector<VideoBackendShortInfo> deprecatedBackends = cv::videoio_registry::getDeprecatedBackends();
+    const std::vector<VideoDeprecatedBackendInfo> deprecatedBackends = cv::videoio_registry::getDeprecatedBackends();
     for (size_t i = 0; i < backends.size(); i++)
     {
         const VideoBackendInfo& info = backends[i];
@@ -204,7 +204,7 @@ bool VideoCapture::open(const String& filename, int apiPreference, const std::ve
 
     for (size_t i = 0; i < deprecatedBackends.size(); i++)
     {
-        const VideoBackendShortInfo& info = deprecatedBackends[i];
+        const VideoDeprecatedBackendInfo& info = deprecatedBackends[i];
         if (apiPreference == info.id)
         {
             CV_LOG_DEBUG(NULL,
@@ -214,9 +214,9 @@ bool VideoCapture::open(const String& filename, int apiPreference, const std::ve
         }
     }
 
-    CV_LOG_DEBUG(NULL, cv::format("VIDEOIO: choosen backend does not work or wrong."
-        "Please make sure that your computer support chosen backend and OpenCV built"
-        "with right flags."));
+    CV_LOG_DEBUG(NULL,  "VIDEOIO: choosen backend does not work or wrong. "
+        "Please make sure that your computer support chosen backend and OpenCV built "
+        "with right flags.");
 
     return false;
 }
@@ -248,7 +248,7 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
 
     const VideoCaptureParameters parameters(params);
     const std::vector<VideoBackendInfo> backends = cv::videoio_registry::getAvailableBackends_CaptureByIndex();
-    const std::vector<VideoBackendShortInfo> deprecatedBackends = cv::videoio_registry::getDeprecatedBackends();
+    const std::vector<VideoDeprecatedBackendInfo> deprecatedBackends = cv::videoio_registry::getDeprecatedBackends();
     for (size_t i = 0; i < backends.size(); i++)
     {
         const VideoBackendInfo& info = backends[i];
@@ -335,7 +335,7 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
 
     for (size_t i = 0; i < deprecatedBackends.size(); i++)
     {
-        const VideoBackendShortInfo& info = deprecatedBackends[i];
+        const VideoDeprecatedBackendInfo& info = deprecatedBackends[i];
         if (apiPreference == info.id)
         {
             CV_LOG_DEBUG(NULL,
@@ -345,9 +345,9 @@ bool VideoCapture::open(int cameraNum, int apiPreference, const std::vector<int>
         }
     }
 
-    CV_LOG_DEBUG(NULL, cv::format("VIDEOIO: choosen backend does not work or wrong."
-        "Please make sure that your computer support chosen backend and OpenCV built"
-        "with right flags."));
+    CV_LOG_DEBUG(NULL, "VIDEOIO: choosen backend does not work or wrong."
+        "Please make sure that your computer support chosen backend and OpenCV built "
+        "with right flags.");
 
     return false;
 }
@@ -664,9 +664,9 @@ bool VideoWriter::open(const String& filename, int apiPreference, int fourcc, do
         }
     }
 
-    CV_LOG_DEBUG(NULL, cv::format("VIDEOIO: choosen backend does not work or wrong."
-        "Please make sure that your computer support chosen backend and OpenCV built"
-        "with right flags."));
+    CV_LOG_DEBUG(NULL, "VIDEOIO: choosen backend does not work or wrong."
+        "Please make sure that your computer support chosen backend and OpenCV built "
+        "with right flags.");
 
     return false;
 }
