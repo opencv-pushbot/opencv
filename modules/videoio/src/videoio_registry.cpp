@@ -50,11 +50,6 @@ namespace {
     cap, (BackendMode)(mode), 1000, name, createBackendFactory(createCaptureFile, createCaptureCamera, createWriter) \
 },
 
-#define DECLARE_DEPRECATED_BACKEND(cap, name) \
-{ \
-    cap, name \
-},
-
 /** Ordering guidelines:
 - modern optimized, multi-platform libraries: ffmpeg, gstreamer, Media SDK
 - platform specific universal SDK: WINRT, AVFOUNDATION, MSMF/DSHOW, V4L/V4L2
@@ -189,13 +184,13 @@ static const struct VideoBackendInfo builtin_backends[] =
 static const struct VideoDeprecatedBackendInfo deprecated_backends[] =
 {
 #ifdef _WIN32
-    DECLARE_DEPRECATED_BACKEND(CAP_VFW, "Video for Windows")
+    {CAP_VFW, "Video for Windows"},
 #endif
-    DECLARE_DEPRECATED_BACKEND(CAP_QT, "QuickTime")
-    DECLARE_DEPRECATED_BACKEND(CAP_UNICAP, "Unicap")
-    DECLARE_DEPRECATED_BACKEND(CAP_OPENNI, "OpenNI")
-    DECLARE_DEPRECATED_BACKEND(CAP_OPENNI_ASUS, "OpenNI")
-    DECLARE_DEPRECATED_BACKEND(CAP_GIGANETIX, "GigEVisionSDK")
+    {CAP_QT, "QuickTime"},
+    {CAP_UNICAP, "Unicap"},
+    {CAP_OPENNI, "OpenNI"},
+    {CAP_OPENNI_ASUS, "OpenNI"},
+    {CAP_GIGANETIX, "GigEVisionSDK"}
 };
 
 
@@ -210,7 +205,6 @@ class VideoBackendRegistry
 {
 protected:
     std::vector<VideoBackendInfo> enabledBackends;
-    std::vector<VideoDeprecatedBackendInfo> deprecatedBackends;
 
     VideoBackendRegistry()
     {
@@ -221,8 +215,6 @@ protected:
             VideoBackendInfo& info = enabledBackends[i];
             info.priority = 1000 - i * 10;
         }
-        const int NN = sizeof(deprecated_backends) / sizeof(deprecated_backends[0]);
-        deprecatedBackends.assign(deprecated_backends, deprecated_backends + NN);
 
         CV_LOG_DEBUG(NULL, "VIDEOIO: Builtin backends(" << N << "): " << dumpBackends());
         if (readPrioritySettings())
@@ -351,11 +343,6 @@ public:
         return result;
     }
 
-    inline std::vector<VideoDeprecatedBackendInfo> getDeprecatedBackends() const
-    {
-        return deprecatedBackends;
-    }
-
 };
 
 } // namespace
@@ -378,12 +365,20 @@ std::vector<VideoBackendInfo> getAvailableBackends_Writer()
     return result;
 }
 
-std::vector<VideoDeprecatedBackendInfo> getDeprecatedBackends()
+bool checkDeprecatedBackend(VideoCaptureAPIs api)
 {
-    const std::vector<VideoDeprecatedBackendInfo> result = VideoBackendRegistry::getInstance().getDeprecatedBackends();
-    return result;
+    const size_t N = sizeof(deprecated_backends) / sizeof(deprecated_backends[0]);
+    for (size_t i = 0; i < N; i++)
+    {
+        const VideoDeprecatedBackendInfo& info = deprecated_backends[i];
+        if (api == info.id)
+        {
+            CV_LOG_DEBUG(NULL, cv::format("VIDEOIO(%s): backend is removed from OpenCV", info.name));
+            return true;
+        }
+    }
+    return false;
 }
-
 
 cv::String getBackendName(VideoCaptureAPIs api)
 {
